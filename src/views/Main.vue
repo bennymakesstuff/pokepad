@@ -30,6 +30,9 @@
             <div class="right">
 
               <div class="poke-screen" v-if="screen==1">
+                <audio id="audio" ref="pokemoncry">
+                  <source type="audio/mp3" :src="`./cries-mp3/${pokemon.id}.mp3`">
+                </audio>
                 <div class="image">
                   <div class="inner" v-if="false" :style="pokemonLargeImage(pokemon.id)"></div>
                   <img :src="pokemonLargeImg(pokemon.id)" style="width: 12rem; height: 12rem;"/>
@@ -55,6 +58,9 @@
 
             </div>
           </div>
+        </div>
+        <div class="speaker-grille">
+          <div class="hole" v-for="hole in 3"></div>
         </div>
       </div>
 
@@ -87,7 +93,7 @@
 
       <div class="right-inner noisy">
         <div class="right-inner-rear noisy">
-          <div class="logo"></div>
+          <div class="logo noisy"></div>
         </div>
       <div class="upper-left-hump"></div>
       <div class="light-bar-rim noisy"></div>
@@ -157,10 +163,11 @@ export default {
   },
   data: function(){
     return {
-      closed: true,
+      closed: false,
       selectedClusterButton: 2,
       currentTab: 'screensaver',
       screen: 1,
+      soundOn: false,
       lightStatus: {
         loading: false,
         error: false,
@@ -300,6 +307,7 @@ export default {
       this.pokemon = pokeResult[Object.keys(pokeResult)[0]][0];
       this.lightStatus.loading = false;
       this.lightStatus.success = true;
+      setTimeout(this.playPokemonCry(this.pokemon.id), 1000);
       setTimeout(this.resetLights, 1000);
 
     },
@@ -316,12 +324,25 @@ export default {
       return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
     },
     toggleCover: function(){
+      if(this.soundOn==false){
+        this.$refs.pokemoncry.muted = false;
+
+      }
       console.log('clicked');
       this.closed = !this.closed;
       this.lightStatus.loading = true;
       this.lightStatus.error = true;
       this.lightStatus.success = true;
+      this.currentTab = 'screensaver';
       setTimeout(this.resetLights, 500);
+    },
+    playPokemonCry: function(pokemonid){
+      //var audio = document.getElementById("audio");
+
+      this.soundEffect.src = './cries-mp3/'+pokemonid+'.mp3';
+      this.soundEffect.play();
+      //this.$refs.pokemoncry.currentTime = 0;
+      //this.$refs.pokemoncry.play();
     },
     screenTabUp: function(){
       if(this.screen<this.screenTabs.length){
@@ -335,7 +356,7 @@ export default {
     }
   },
   mounted() {
-
+    this.soundEffect = new Audio();
   }
 };
 </script>
@@ -357,7 +378,7 @@ export default {
                     width: calc(100% - 4rem);
                     height: auto;
                     margin: 1rem 2rem;
-                    max-width: 13.5rem;
+                    max-width: 11.5rem;
                     height: 13.5rem;
                     padding: 0;
 
@@ -367,8 +388,8 @@ export default {
                       > .arrow-button {flex: 1;
                                       background: transparent;
                                       display:inline-block;
-                                      height: 4rem;
-                                      width: 3rem;
+                                      height: 3.5rem;
+                                      width: 2.5rem;
                                       max-width: 1rem;
                                       position:relative;
                                       overflow:hidden;
@@ -378,9 +399,9 @@ export default {
                     > .arrow-button > .inner {
                     content:"";
                     position:absolute;
-                    width:3rem;
+                    width:2.5rem;
                     box-shadow: 0px 0px 4px 2px rgba(#ffffff, 0.15);
-                    height:3rem;
+                    height:2.5rem;
                     right:0px;
                     top:50%;
                     border: 1px solid #333333;
@@ -521,7 +542,24 @@ export default {
                         border-radius: 0.35rem;
                         border-bottom-left-radius: 3rem;
                         padding: 3rem 2rem;
+                        position: relative;
 
+    > .speaker-grille {height: 2.2rem;
+                      width: 3.5rem;
+                      position: absolute;
+                      bottom: 0.45rem;
+                      right: 2rem;
+
+                      > .hole {background-color: rgb(66, 66, 66);
+                              border: 1px solid #d6d6d6;
+                              box-shadow: inset -2px -2px 6px 1px rgba(#000000, 0.5);
+                              height: 2.2rem;
+                              transform: rotate(30deg);
+                              width: 0.5rem;
+                              border-radius: 0.5rem;
+                              display: inline-block;
+                              margin-right: 0.5rem;}
+                    }
 
     > .window {width: calc(100%);
               box-shadow: inset 0px 0px 2px 1px rgba(#333333, 0.5);
@@ -556,6 +594,7 @@ export default {
 
 .hinge {width: 1rem; height: calc(100vh - 1.5rem);display: inline-block; vertical-align: top;margin-top: 0.25rem;
         box-shadow: inset 0px 0px 8px 1px rgba(#333333, 0.8);background-color: rgb(168, 16, 16);border-radius: 0.35rem;
+        overflow: hidden;
 
         > .hinge-piece {min-height: 5rem; width: 100%; border-bottom: 1px solid #3b0808;box-shadow: inset 0 0 4px 2px rgba(#4f0808, 0.68);}
         > .hinge-piece:first-child {min-height: 10rem;}
@@ -563,7 +602,7 @@ export default {
 
 .right-side.close {transform: rotateY(180deg);}
 .right-side.close > .right-inner {transform: translate(calc(1rem + 0px));}
-.right-side.close > .right-inner > .right-inner-rear {width: 100%;}
+.right-side.close > .right-inner > .right-inner-rear {width: 100%;z-index: 100;}
 
 .right-side {width: calc(50% - 1rem); height: calc(100vh - 1rem);
             display: inline-block; vertical-align: top;
@@ -635,11 +674,12 @@ export default {
                 //margin-top: calc(9rem + 4px);
 
                 .logo {width: calc(100% - 4rem);
-                      margin: 5rem 2rem 1rem 2rem;
+                      margin: 2rem 2rem 1rem 2rem;
                       background: transparent url('../ui/pokepad-logo.png') no-repeat;
                       background-size: contain;
-                      background-position: center;
-                      height: 20rem;}
+                      background-position: center 2rem;
+                      height: 32rem;
+                      }
 
                 .power-button {position: absolute; bottom: 1rem; left: 1rem;}
                 }
@@ -707,14 +747,15 @@ export default {
                                           right: 0.5rem;
                                           top: 0;
                                         }
-
+                                        > .menu-item.pokemon:hover {background-color: lighten($screenTextColor, 35%);}
+                                        > .menu-item:hover {background-color: lighten($screenTextColor, 35%);}
                                         > .menu-item {width: calc(100% - 1rem);
                                                       line-height: 3rem;
                                                       overflow: hidden;
                                                       height: 3rem;
                                                       font-size: 0.7rem;
                                                       padding: 0rem 0.5rem;
-                                                      border-bottom: 1px solid #333333;
+                                                      border-bottom: 1px solid $screenTextColor;
                                                       min-height: 3rem;
                                                       position: relative;
 

@@ -57,7 +57,7 @@ module.exports = {
   plugins: [
   new VueLoaderPlugin(),
   new HtmlWebpackPlugin({
-    title: 'PokeDex',
+    title: 'PokePad',
     filename: 'index.html',
     template: 'src/index.html',
     inject: true

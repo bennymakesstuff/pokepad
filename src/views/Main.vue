@@ -19,7 +19,7 @@
 
       <div class="pokemon-image-window">
         <div class="window">
-          <h1 class="" v-if="pokemon==null">No Pokemon Selected</h1>
+          <h1 class="no-pokemon" v-if="pokemon==null">No Pokemon Selected</h1>
           <div class="pokemon-screen" v-if="pokemon!=null">
             <div class="left">
               <div :class="['tab',selectedTab(1)]">P</div>
@@ -99,7 +99,7 @@
       <div class="light-bar-rim noisy"></div>
 
       <div class="menu-cluster">
-        <div class="tab" v-if="currentTab=='screensaver'">
+        <div class="tab screensaver" v-if="currentTab=='screensaver'">
           <div class="title">PokeDex v1</div>
         </div>
 
@@ -189,11 +189,7 @@ export default {
         {number: 7, pokemonStart: 0, pokemonEnd: 151, pokemon: null},
         {number: 8, pokemonStart: 0, pokemonEnd: 151, pokemon: null},
       ],
-      pokemon: {
-        name: 'Benysaur',
-        id: 3,
-
-      },
+      pokemon: null,
       gen: 1,
       generationNames: [
         'generation-i',
@@ -324,16 +320,18 @@ export default {
       return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
     },
     toggleCover: function(){
-      if(this.soundOn==false){
-        this.$refs.pokemoncry.muted = false;
 
-      }
-      console.log('clicked');
       this.closed = !this.closed;
+
       this.lightStatus.loading = true;
       this.lightStatus.error = true;
       this.lightStatus.success = true;
-      this.currentTab = 'screensaver';
+
+      setTimeout(() => {
+        this.pokemon = null;
+        this.currentTab = 'screensaver';
+      }, 250);
+
       setTimeout(this.resetLights, 500);
     },
     playPokemonCry: function(pokemonid){
@@ -378,11 +376,11 @@ export default {
                     width: calc(100% - 4rem);
                     height: auto;
                     margin: 1rem 2rem;
-                    max-width: 11.5rem;
-                    height: 13.5rem;
+                    height: 13 .5rem;
                     padding: 0;
+                    margin-top: 2rem;
 
-                    > .row {height: 4rem; width: 100%; display: flex;text-align: center;padding: 0;margin-bottom: 0.5rem;
+                    > .row {height: 4rem; width: 100%; display: flex;text-align: center;padding: 0;margin-bottom: 0.5rem;max-width: 11.5rem;margin: auto;
                       > .middle {flex: 1;}
 
                       > .arrow-button {flex: 1;
@@ -567,6 +565,13 @@ export default {
               border-radius: 0.25rem;
               background-color: #e3e3e3;
               border: 1px solid #333333;
+              background: #e3e3e3 url('../ui/grid.png') repeat;
+
+              > .no-pokemon {background-color: transparent;
+                            width: 100%;
+                            background: transparent url('../ui/gridball.png') no-repeat;
+                            background-position: center;
+                            height: 15rem;}
 
               > .pokemon-screen {display: flex;width: 100%;height: 15rem;
 
@@ -593,10 +598,10 @@ export default {
 }
 
 .hinge {width: 1rem; height: calc(100vh - 1.5rem);display: inline-block; vertical-align: top;margin-top: 0.25rem;
-        box-shadow: inset 0px 0px 8px 1px rgba(#333333, 0.8);background-color: rgb(168, 16, 16);border-radius: 0.35rem;
+        box-shadow: inset 0px 0px 8px 1px rgba(#4e0404, 0.8);background-color: rgb(168, 16, 16);border-radius: 0.35rem;
         overflow: hidden;
 
-        > .hinge-piece {min-height: 5rem; width: 100%; border-bottom: 1px solid #3b0808;box-shadow: inset 0 0 4px 2px rgba(#4f0808, 0.68);}
+        > .hinge-piece {min-height: 5rem; width: 100%; border-bottom: 1px solid #3b0808;/*box-shadow: inset 0 0 4px 2px rgba(#4f0808, 0.68);*/}
         > .hinge-piece:first-child {min-height: 10rem;}
       }
 
@@ -717,6 +722,11 @@ export default {
                     color: $screenTextColor;
                     overflow: hidden;
                     text-align: left;
+
+                    > .screensaver {background: transparent url('../ui/pixelated-logo.png') no-repeat;
+                                    background-size: 80%;
+                                    background-position: center;
+                                    opacity: 0.3;}
 
                     > .tab {width: 100%;
                             flex: 1;

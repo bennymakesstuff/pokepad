@@ -1,11 +1,15 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 
 module.exports = {
   entry: './src/app.js',
   target: 'web',
-  mode: 'development',
+  mode: 'production',
+  devtool: 'source-map',
   output: {
     filename: 'app.js',
     path: path.resolve(__dirname, 'dist'),
@@ -29,13 +33,14 @@ module.exports = {
         test: /\.scss$/,
         use: [
           "vue-style-loader",
+          MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { esModule: false }},
           "sass-loader"
         ]
       },
       {
         test: /\.css$/,
-        use: ["vue-style-loader", "css-loader"]
+        use: ["vue-style-loader", MiniCssExtractPlugin.loader, "css-loader"]
       },
       {
         test: /\.(png|jpe?g|gif|woff|woff2)$/i,
@@ -54,13 +59,22 @@ module.exports = {
       },
     ]
   },
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin(),
+    ],
+  },
   plugins: [
   new VueLoaderPlugin(),
   new HtmlWebpackPlugin({
-    title: 'PokeDex',
+    title: 'PokePad',
     filename: 'index.html',
     template: 'src/index.html',
     inject: true
-  })
+  }),
+  new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css",
+    }),
   ],
 };

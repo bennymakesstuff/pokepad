@@ -33,14 +33,26 @@ module.exports = {
         test: /\.scss$/,
         use: [
           "vue-style-loader",
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+                esModule: false,
+            },
+          },
           { loader: 'css-loader', options: { esModule: false }},
           "sass-loader"
         ]
       },
       {
         test: /\.css$/,
-        use: ["vue-style-loader", MiniCssExtractPlugin.loader, "css-loader"]
+        use: ["vue-style-loader",
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+              esModule: false,
+          },
+        },
+        "css-loader"]
       },
       {
         test: /\.(png|jpe?g|gif|woff|woff2)$/i,
